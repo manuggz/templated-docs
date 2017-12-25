@@ -70,10 +70,16 @@ def find_template_file(template_name):
     load a template in memory, because we'll deal with it ourselves.
     """
     for loader in _get_template_loaders():
-        for origin in loader.get_template_sources(template_name, None):
+        try:
+            template_sources = loader.get_template_sources(template_name,None)
+        except TypeError:
+            template_sources = loader.get_template_sources(template_name)
+
+        for origin in template_sources:
             path = getattr(origin, 'name', origin)  # Django <1.9 compatibility
             if os.path.exists(path):
                 return path
+
     raise TemplateDoesNotExist(template_name)
 
 
